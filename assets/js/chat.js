@@ -8,7 +8,8 @@ let socket;
 let userData = {};
 
 function addUserMessage(message) {
-  $screen.innerHTML += `
+  const element = document.createElement('div');
+  element.innerHTML += `
     <div class="message message--${ userData._id === message.user.id ? 'own' : 'theirs' }">
       <div class="columns is-marginless">
         <div class="column is-1">
@@ -20,6 +21,7 @@ function addUserMessage(message) {
         </div>
       </div>
     </div>`;
+  $screen.appendChild(element);
 }
 
 function sendNewMessage(e) {
@@ -40,8 +42,12 @@ function sendNewMessage(e) {
   $input.value = '';
 }
 
-function addUserChat(user) {
-  $screen.innerHTML += `<p class="message has-text-primary is-size-7">El usuario <b>${ user }</b> se ha conectado</p>`;
+function addUserChat(user, disconnected) {
+  const element = document.createElement('div');
+  element.innerHTML = `<p class="message has-text-${ disconnected ? 'danger' : 'primary' } is-size-7">
+    El usuario <b>${ user }</b> se ha ${ disconnected ? 'desconectado' : 'conectado' }
+  </p>`;
+  $screen.appendChild(element);
 }
 
 function messageReceived(e) {
@@ -53,7 +59,11 @@ function messageReceived(e) {
     case "MESSAGE_RECEIVED":
       addUserMessage(message.payload);
       break;
+    case "USER_DISCONNECTED":
+      addUserChat(message.payload.username, true);
+      break;
   }
+  $screen.scrollTop = $screen.scrollHeight;
 }
 
 function joinUserChat() {

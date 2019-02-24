@@ -19,6 +19,8 @@
 }
 .chat__screen {
   height: 60vh;
+  overflow: hidden;
+  overflow-y: auto;
 }
 .message {
   box-sizing: border-box;
