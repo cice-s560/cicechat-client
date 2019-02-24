@@ -9,12 +9,16 @@ let userData = {};
 
 function addUserMessage(message) {
   $screen.innerHTML += `
-    <div class="message">
-      <figure>
-        <img src="${message.user.picture}" >    
-        <figcaption>${message.user.name}</figcaption>
-      </figure>
-      <p>${message.text}</p>
+    <div class="message message--theirs">
+      <div class="columns is-marginless">
+        <div class="column is-1">
+          <img class="is-fullwidth" src="${ message.user.picture }">
+        </div>
+        <div class="column is-11">
+          <h4 class="has-text-black">${ message.user.name }</h4>
+          <p>${ message.text }</p>
+        </div>
+      </div>
     </div>`;
 }
 
@@ -32,10 +36,11 @@ function sendNewMessage(e) {
       }
     })
   );
+  $input.value = '';
 }
 
 function addUserChat(user) {
-  $screen.innerHTML += `<p class="has-text-primary is-size-7">el usuario <b>${user}</b> se ha conectado</p>`;
+  $screen.innerHTML += `<p class="message has-text-primary is-size-7">El usuario <b>${ user }</b> se ha conectado</p>`;
 }
 
 function messageReceived(e) {

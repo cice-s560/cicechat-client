@@ -10,22 +10,28 @@
   </head>
   <body>
     <div id="bg"></div>
-
-    <h1 class="title">Bienvenido <span id="username"></span>,al chat</h1>
-
-    <main class="container">
-      <section id="chat-box">
-        <div id="screen"></div>
-        <footer>
-          <form id="message-form">
-            <input type="text" id="message-input" />
-            <button type="submit" class="button is-success is-small">
-              Enviar
-            </button>
+    <div class="chat container has-background-white">
+      <header class="columns is-marginless chat__header" class="has-text-centered">
+        <div class="column is-12">
+          <h1 class="title">Bienvenido a CICE Chat, <span id="username"></span>!</h1>
+        </div>
+      </header>
+      <main class="container has-text-grey">
+          <div class="columns is-marginless">
+            <div class="column is-12">
+              <div id="screen" class="chat__screen"></div>
+            </div>
+          </div>
+          <form autocomplete="off" id="message-form" class="columns has-background-grey is-marginless">
+            <div class="column is-10">
+              <input class="input" type="text" id="message-input" />
+            </div>
+            <div class="column is-2">
+              <button type="submit" class="button is-success is-fullwidth">Enviar</button>
+            </div>
           </form>
-        </footer>
-      </section>
-    </main>
+      </main>
+    </div>
 
     <script src="assets/js/chat.js"></script>
   </body>
