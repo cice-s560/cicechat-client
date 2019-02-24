@@ -9,7 +9,7 @@ let userData = {};
 
 function addUserMessage(message) {
   $screen.innerHTML += `
-    <div class="message message--theirs">
+    <div class="message message--${ userData._id === message.user.id ? 'own' : 'theirs' }">
       <div class="columns is-marginless">
         <div class="column is-1">
           <img class="is-fullwidth" src="${ message.user.picture }">
@@ -31,7 +31,8 @@ function sendNewMessage(e) {
         text: $input.value,
         user: {
           name: userData.username,
-          picture: userData.picture
+          picture: userData.picture,
+          id: userData._id
         }
       }
     })
