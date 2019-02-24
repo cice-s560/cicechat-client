@@ -3,6 +3,8 @@ const token = urlParams.get("token");
 const $screen = document.getElementById("screen");
 const $form = document.getElementById("message-form");
 const $input = document.getElementById("message-input");
+// Init emoji picker
+new MeteorEmoji();
 
 let socket;
 let userData = {};
