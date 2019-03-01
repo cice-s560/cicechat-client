@@ -39,14 +39,63 @@
         box-sizing: border-box;
       }
 
-      #chat-box footer input {
+      #chat-box footer #input-container {
         width: calc(100% - 100px);
+        display: inline-block;
       }
 
       #chat-box footer button {
         width: 90px;
         margin-left: 5px;
       }
+
+      .message {
+        box-sizing: border-box;
+        padding-right: 6rem;
+        padding-left: 0.4rem;
+      }
+
+      .message.me {
+        padding-right: 0.4rem;
+        padding-left: 6rem;
+      }
+
+      .message .body-message {
+        background-color: #f0ffb3;
+        border: 1px solid rgba(0,0,0,0.4);
+        border-radius: 8px;
+        box-sizing: border-box;
+        padding: 1rem;
+      }
+
+      .message.me .body-message {
+        background-color: #8fbe62;
+      }
+
+      .message .body-message img,
+      .message .body-message figcaption {
+        display: inline-block;
+        vertical-align: bottom;
+      }
+
+      .message .body-message figure {
+        margin-bottom: 10px;
+      }
+
+      .message .body-message img {
+        max-width: 35px;
+        border-radius: 100%;
+        margin-right: 10px;
+      }
+
+      .message .body-message figcaption {
+        font-weight: bold;
+      }
+
+       .message .body-message p {
+         color: #333;
+         font-size: 0.9rem;
+       }
     </style>
   </head>
   <body>
@@ -59,15 +108,21 @@
         <div id="screen"></div>
         <footer>
           <form id="message-form">
-            <input type="text" id="message-input" />
+            <div id="input-container">
+              <input type="text" id="message-input" data-emoji-picker="true" />
+            </div>
             <button type="submit" class="button is-success is-small">
               Enviar
             </button>
           </form>
         </footer>
       </section>
+      <footer>
+        <a id="exit-chat" href="./" class="has-text-danger">Salir del chat</a>
+      </footer>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/vanilla-emoji-picker@0.2.4/dist/emojiPicker.min.js"></script>
     <script>
       const urlParams = new URLSearchParams(window.top.location.search);
       const token = urlParams.get("token");
@@ -78,14 +133,43 @@
       let socket;
       let userData = {};
 
-      function addUserMessage(message) {
+      function userByeBye(message) {
+          $screen.innerHTML += `
+            <p class="has-text-danger">El usuario <b>${message.username}</b> se ha ido :(</p>`;
+      }
+
+      function paintPreviousMessages() {
+        let localData = localStorage.chatData;
+        localData = localData ? JSON.parse(localData) : {messages: []};
+
+        if (localData.messages.length) {
+          localData.messages.forEach(message => addUserMessage(message, true));
+        }
+      }
+
+      function addUserMessage(message, isInitial) {
+        if (!isInitial) {
+          let localData = localStorage.chatData;
+          localData = localData ? JSON.parse(localData) : {messages: []};
+
+          localData.messages.push(message);
+
+          localStorage.setItem("chatData", JSON.stringify(localData));
+
+        }
+       
+        const isItMeAsClass = message.user.id === userData._id ? "me" : "";
+        const nameToShow = message.user.id === userData._id ? "Yo" : message.user.name;
+
         $screen.innerHTML += `
-            <div class="message">
-                <figure>
-                    <img src="${message.user.picture}" >    
-                    <figcaption>${message.user.name}</figcaption>
-                </figure>
+            <div class="message ${isItMeAsClass}">
+               <div class="body-message">
+                  <figure>
+                      <img src="${message.user.picture}" >    
+                      <figcaption>${nameToShow}</figcaption>
+                  </figure>
                 <p>${message.text}</p>
+              </div>
             </div>`;
       }
 
@@ -98,6 +182,7 @@
             payload: {
               text: $input.value,
               user: {
+                id: userData._id,
                 name: userData.username,
                 picture: userData.picture
               }
@@ -120,6 +205,10 @@
           case "MESSAGE_RECEIVED":
             addUserMessage(message.payload);
             break;
+          case "USER_DISCONNECTED":
+            console.log("Me cuelo", message);
+            userByeBye(message.payload);
+            break;
         }
       }
 
@@ -133,6 +222,7 @@
             JSON.stringify({
               type: "CONNECTION",
               payload: {
+                id: userData._id,
                 username: userData.username
               }
             })
@@ -168,6 +258,10 @@
         $form.addEventListener("submit", sendNewMessage);
 
         joinUserChat();
+
+        new EmojiPicker();
+
+        paintPreviousMessages();
       });
     </script>
   </body>
